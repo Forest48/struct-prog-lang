@@ -9,18 +9,18 @@ break character stream into tokens, provide a token stream
 import re
 
 patterns = [
-#    ["\\+\\+", "++"],
+    ["\\+\\+", "++"],
     ["\\+", "+"],
     ["\\-", "-"],
     ["\\*", "*"],
     ["\\/", "/"],
     ["\\(", "("],
     ["\\)", ")"],
-    ["(\\d+\\.\\d+*)|(\\d*\\.\\d+)|(\\d+)", "number"] # all positive numbers
+    ["(\\d+\\.\\d+*)|(\\d*\\.\\d+)|(\\d+)", "number"], # all positive numbers
 ]
 
-for pattern in patterns:
-    pattern[0] = re.compile(pattern[0])
+#for pattern in patterns:
+ #   pattern[0] = re.compile(pattern[0])
 
 def tokenize (characters):
     tokens = []
@@ -33,19 +33,25 @@ def tokenize (characters):
         assert match # match must always be something or we will get an error
         token = {
             # dont use value match with bc it could mean different things depending on where it was found
-            'tag':tag,
-            'value':match.group(0),
+            "tag":tag,
+            "value":match.group(0),
             # position is important because it helps point out where the error is
-            'position':position
+            "position":position
         }
-        tokens.append(token)
         position = match.end()
+        tokens.append(token)
     for token in tokens:
         if token["tag"] == "number":
             if "." in token["value"]:
                 token["value"] = float(token["value"])
             else:
                 token["value"] = int(token["value"])
+    token = {
+        "tag": "end",
+        "value": "",
+        "position": position,
+    }
+    tokens.append(token)
     return tokens
 
 def test_simple_tokens():
@@ -63,12 +69,13 @@ def test_simple_tokens():
         tokens = tokenize(number)
         assert tokens[0]["tag"] == "number"
         assert tokens[0]["value"] == float(number)
-"""    for characters in ["+", "++", "-"]:
-        tokens = tokenize(characters)
-        assert tokens[0]["tag"] == characters
-        assert tokens[0]["value"] == characters """
+#    for characters in ["+", "++", "-"]:
+ #       tokens = tokenize(characters)
+  #      assert tokens[0]["tag"] == characters
+   #     assert tokens[0]["value"] == characters """
 
 if __name__ == "__main__":
+    print("beginning program")
     test_simple_tokens()
     tokens = tokenize("123.45")
     print(tokens)
