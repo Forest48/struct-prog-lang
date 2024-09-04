@@ -19,8 +19,8 @@ patterns = [
     ["(\\d+\\.\\d+*)|(\\d*\\.\\d+)|(\\d+)", "number"], # all positive numbers
 ]
 
-#for pattern in patterns:
- #   pattern[0] = re.compile(pattern[0])
+for pattern in patterns:
+    pattern[0] = re.compile(pattern[0])
 
 def tokenize (characters):
     tokens = []
