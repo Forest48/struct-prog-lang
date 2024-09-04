@@ -1,8 +1,8 @@
-# Forest Lang
-# tokenizer provided by DeLozier, edited by me
-# 8/26/24
 """
-break character stream into tokens, provide a token stream
+ Forest Lang
+ tokenizer coded by DeLozier in class, edited by me
+ 8/26/24
+ break character stream into tokens, provide a token stream
 """
 
 # re stands for REgular library
@@ -16,7 +16,7 @@ patterns = [
     ["\\/", "/"],
     ["\\(", "("],
     ["\\)", ")"],
-    ["(\\d+\\.\\d+*)|(\\d*\\.\\d+)|(\\d+)", "number"], # all positive numbers
+    ["(\\d+\\.\\d*)|(\\d*\\.\\d+)|(\\d+)", "number"] # all positivr numbers
 ]
 
 for pattern in patterns:
@@ -38,6 +38,9 @@ def tokenize (characters):
             # position is important because it helps point out where the error is
             "position":position
         }
+        print(tag)
+        print(match.group(0))
+        print(position)
         position = match.end()
         tokens.append(token)
     for token in tokens:
