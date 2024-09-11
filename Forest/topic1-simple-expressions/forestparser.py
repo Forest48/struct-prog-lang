@@ -11,8 +11,8 @@
     expression = term { ("+" | "-") term}
 """
 
-from delozierstokenizer import tokenize
-#from tokenizer import tokenize
+#from foresttokenizer import tokenize
+from tokenizer import tokenize
 
 def parse_simple_expression(tokens):
     """
