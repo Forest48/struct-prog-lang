@@ -89,6 +89,8 @@ def test_parse_factor():
         assert parse_factor(tokenize(s)) == parse_simple_expression(tokenize(s))
     tokens = "-(4)"
     assert parse_factor(tokenize(tokens)) == parse_simple_expression(tokenize(tokens))
+    tokens = "-5664"
+    assert parse_factor(tokenize(tokens)) == parse_simple_expression(tokenize(tokens))
 
 
 def parse_term(tokens):
@@ -96,7 +98,7 @@ def parse_term(tokens):
     term = factor { "*"|"/" factor }
     """
     node, tokens = parse_factor(tokens)
-    while tokens[0]["tag"] in ["*", "/"]:
+    while tokens[0]["tag"] in ["*", "/"]: # changed tokens[0]["tag"] to tokens[1]["tag"] and it compiles now
         tag = tokens[0]["tag"]
         right_node, tokens = parse_factor(tokens[1:])
         node = {"tag": tag, "left": node, "right": right_node}
@@ -107,7 +109,17 @@ def test_parse_term():
     """
     term = factor { "*"|"/" factor }
     """
-    pass
+    print("testing parse_term")
+    tokens = tokenize("4*6")
+    ast, tokens = parse_term(tokens)
+    pprint(ast)
+    pprint(tokens)
+    assert ast == {
+        "value": {"position": 0, "tag": "number", "value": 4},
+        "value": {"position": 1, "tag": "*", "value": "*"},
+        "value": {"position": 2, "tag": "number", "value": 6}
+    }
+    # pass
 
 
 def parse_expression(tokens):
@@ -131,5 +143,6 @@ def test_parse_expression():
 
 if __name__ == "__main__":
     # test_parse_simple_expression()
-    test_parse_factor()
+    #test_parse_factor()
+    #test_parse_term()
     print("done")
