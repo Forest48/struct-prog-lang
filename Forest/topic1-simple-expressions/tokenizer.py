@@ -1,6 +1,7 @@
 """ 
 break character stream into tokens, provide a token stream 
 """
+# this code was copied from DeLozier's github
 
 import re
 
@@ -61,7 +62,7 @@ def test_simple_tokens():
         tokens = tokenize(number)
         assert tokens[0]["tag"] == "number"
         assert tokens[0]["value"] == float(number)
-
+    
 if __name__ == "__main__":
     test_simple_tokens()
     # tokens = tokenize("123.45*+1234*/123*()***34235****")
