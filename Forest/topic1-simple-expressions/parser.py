@@ -79,7 +79,7 @@ def parse_factor(tokens):
     """
     return parse_simple_expression(tokens)
 
-# THIS FUNCTION NEEDS TESTS WRITTEN BY ME
+# THIS FUNCTION gained a TEST WRITTEN BY ME
 def test_parse_factor():
     """
     factor = simple_expression
@@ -87,6 +87,8 @@ def test_parse_factor():
     print("testing parse_factor")
     for s in ["2", "(2)", "-2"]:
         assert parse_factor(tokenize(s)) == parse_simple_expression(tokenize(s))
+    tokens = "-(4)"
+    assert parse_factor(tokenize(tokens)) == parse_simple_expression(tokenize(tokens))
 
 
 def parse_term(tokens):
