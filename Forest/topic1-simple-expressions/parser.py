@@ -98,7 +98,7 @@ def parse_term(tokens):
     term = factor { "*"|"/" factor }
     """
     node, tokens = parse_factor(tokens)
-    while tokens[0]["tag"] in ["*", "/"]: # changed tokens[0]["tag"] to tokens[1]["tag"] and it compiles now
+    while tokens[0]["tag"] in ["*", "/"]:
         tag = tokens[0]["tag"]
         right_node, tokens = parse_factor(tokens[1:])
         node = {"tag": tag, "left": node, "right": right_node}
@@ -112,14 +112,32 @@ def test_parse_term():
     print("testing parse_term")
     tokens = tokenize("4*6")
     ast, tokens = parse_term(tokens)
-    pprint(ast)
-    pprint(tokens)
     assert ast == {
-        "value": {"position": 0, "tag": "number", "value": 4},
-        "value": {"position": 1, "tag": "*", "value": "*"},
-        "value": {"position": 2, "tag": "number", "value": 6}
+        'left': {'position': 0, 'tag': 'number', 'value': 4},
+        'right': {'position': 2, 'tag': 'number', 'value': 6},
+        'tag': '*'
     }
-    # pass
+    #pprint(ast)
+    tokens = tokenize("12/2*9")
+    ast, tokens = parse_term(tokens)
+    assert ast == {
+        'left': {'left': {'position': 0, 'tag': 'number', 'value': 12},
+        'right': {'position': 3, 'tag': 'number', 'value': 2},
+        'tag': '/'},
+        'right': {'position': 5, 'tag': 'number', 'value': 9},
+        'tag': '*'
+    }
+    #pprint(ast)
+    tokens = tokenize("2*(9+8)")
+    ast, tokens = parse_term(tokens)
+    assert ast == {
+        'left': {'position': 0, 'tag': 'number', 'value': 2},
+        'right': {'left': {'position': 3, 'tag': 'number', 'value': 9},
+        'right': {'position': 5, 'tag': 'number', 'value': 8},
+        'tag': '+'},
+        'tag': '*'
+    }
+    #pprint(ast)
 
 
 def parse_expression(tokens):
@@ -144,5 +162,5 @@ def test_parse_expression():
 if __name__ == "__main__":
     # test_parse_simple_expression()
     #test_parse_factor()
-    #test_parse_term()
+    test_parse_term()
     print("done")
