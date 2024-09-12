@@ -70,7 +70,15 @@ def test_parse_simple_expression():
     ast, tokens = parse_simple_expression(tokens)
     assert ast["tag"] == "number"
     assert ast["value"] == 123
-    # pprint(ast) 
+    # pprint(ast)
+    tokens = tokenize("-679")
+    ast, tokens = parse_simple_expression(tokens)
+    assert ast == {
+        'tag': 'negate', 
+        'value': {'position': 1, 'tag': 'number', 'value': 679}
+    }
+    #pprint(ast) 
+
     
 
 def parse_factor(tokens):
@@ -104,7 +112,7 @@ def parse_term(tokens):
         node = {"tag": tag, "left": node, "right": right_node}
     return node, tokens
 
-# THIS FUNCTION NEEDS TESTS WRITTEN BY ME
+# THIS FUNCTION has recieved TESTS WRITTEN BY ME
 def test_parse_term():
     """
     term = factor { "*"|"/" factor }
@@ -118,12 +126,30 @@ def test_parse_term():
         'tag': '*'
     }
     #pprint(ast)
+    tokens = tokenize("8*-4")
+    ast, tokens = parse_term(tokens)
+    assert ast == {
+        'left': {'position': 0, 'tag': 'number', 'value': 8},
+        'right': {'tag': 'negate',
+            'value': {'position': 3, 'tag': 'number', 'value': 4}},
+        'tag': '*'
+    }
+    #pprint(ast)
+    tokens = tokenize("-67/12")
+    ast, tokens = parse_term(tokens)
+    assert ast == {
+        'left': {'tag': 'negate',
+            'value': {'position': 1, 'tag': 'number', 'value': 67}},
+        'right': {'position': 4, 'tag': 'number', 'value': 12},
+        'tag': '/'
+    }
+    #pprint(ast)
     tokens = tokenize("12/2*9")
     ast, tokens = parse_term(tokens)
     assert ast == {
         'left': {'left': {'position': 0, 'tag': 'number', 'value': 12},
-        'right': {'position': 3, 'tag': 'number', 'value': 2},
-        'tag': '/'},
+            'right': {'position': 3, 'tag': 'number', 'value': 2},
+            'tag': '/'},
         'right': {'position': 5, 'tag': 'number', 'value': 9},
         'tag': '*'
     }
@@ -133,10 +159,19 @@ def test_parse_term():
     assert ast == {
         'left': {'position': 0, 'tag': 'number', 'value': 2},
         'right': {'left': {'position': 3, 'tag': 'number', 'value': 9},
-        'right': {'position': 5, 'tag': 'number', 'value': 8},
-        'tag': '+'},
+            'right': {'position': 5, 'tag': 'number', 'value': 8},
+            'tag': '+'},
         'tag': '*'
     }
+    #pprint(ast)
+    tokens = tokenize("(2-8)/12")
+    ast, tokens = parse_term(tokens)
+    assert ast == {
+        'left': {'left': {'position': 1, 'tag': 'number', 'value': 2},
+            'right': {'position': 3, 'tag': 'number', 'value': 8},
+            'tag': '-'},
+        'right': {'position': 6, 'tag': 'number', 'value': 12},
+        'tag': '/'}
     #pprint(ast)
 
 
@@ -167,8 +202,8 @@ def test_parse():
     assert parse(tokens) == parse_expression(tokens)
 
 if __name__ == "__main__":
-    # test_parse_simple_expression()
-    #test_parse_factor()
+    test_parse_simple_expression()
+    test_parse_factor()
     test_parse_term()
     test_parse()
     print("done")

@@ -17,7 +17,7 @@ def equals(code, environment, expectedResult, expectedEnvironment=None):
     -- got --
     {[result]}."""
     if expectedEnvironment != None:
-        assert (environment = expectedEnvironment), f"""error: when executing
+        assert (environment == expectedEnvironment), f"""error: when executing
         {[code]}
         --expected--
         {[expectedEnvironment]}
