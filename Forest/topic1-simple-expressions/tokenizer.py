@@ -52,8 +52,8 @@ def tokenize(characters):
 
 def test_simple_tokens():
     print("testing simple tokens")
-    assert tokenize("+") == [{"tag": "+", "value": "+", "position": 0}]
-    assert tokenize("-") == [{"tag": "-", "value": "-", "position": 0}]
+    assert tokenize("+") == [{"tag": "+", "value": "+", "position": 0}, {'tag': None, 'value': None, 'position': 1}]
+    assert tokenize("-") == [{"tag": "-", "value": "-", "position": 0}, {'tag': None, 'value': None, 'position': 1}]
     i = 0
     for char in "+-*/()":
         tokens = tokenize(char)
