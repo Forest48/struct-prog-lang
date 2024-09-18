@@ -10,7 +10,11 @@ Accept a string of tokens, return an AST expressed as stack of dictionaries
     simple_expression = number | "(" expression ")" | "-" simple_expression
     factor = simple_expression
     term = factor { "*"|"/" factor }
-    expression = term { "+"|"-" term }
+    math_expression = term { "+"|"-" term }
+    comp_expression = math_expression ["==" | "!=" | "<" | ">" | "<=" | ">=" math_expression]
+    bool_term = comp_expression {"and" comp_expression}
+    bool_expression = bool_term {"or" bool_term}
+    expression = bool_expression
 """
 
 from pprint import pprint
@@ -175,7 +179,7 @@ def test_parse_term():
     #pprint(ast)
 
 
-def parse_expression(tokens):
+def parse_math_expression(tokens):
     """
     expression = term { "+"|"-" term }
     """
@@ -187,25 +191,77 @@ def parse_expression(tokens):
     return node, tokens
 
 # i can leave this one alone i think?
+def test_parse_math_expression():
+    """
+    expression = term { "+"|"-" term }
+    """
+    pass
+
+
+def parse_expression(tokens):
+    """
+    expression = bool_expression
+    """
+    return parse_math_expression(tokens)
+
 def test_parse_expression():
     """
     expression = term { "+"|"-" term }
     """
     pass
 
+def parse_comp_expression(tokens):
+    node, tokens = parse_math_expression(tokens)
+    while tokens[0]["tag"] in ["==", "!=", "<=", ">=", ">", ">"]:
+        tag = tokens[0]["tag"]
+        right_node, tokens = parse_math_expression(tokens[1:])
+        node = {"tag": tag, "left": node, "right": right_node}
+    return node, tokens
+
+def test_parse_comp_expression(): 
+    pass
+
+
+def parse_bool_term(tokens):
+    node, tokens = parse_comp_expression(tokens)
+    while tokens[0]["tag"] in ["or"]:
+        tag = tokens[0]["tag"]
+        right_node, tokens = parse_comp_expression(tokens[1:])
+        node = {"tag": tag, "left": node, "right": right_node}
+    return node, tokens
+
+def test_parse_bool_term(): 
+    pass
+
+
+def parse_bool_expression(tokens):
+    node, tokens = parse_bool_term(tokens)
+    while tokens[0]["tag"] in ["and"]:
+        tag = tokens[0]["tag"]
+        right_node, tokens = parse_bool_term(tokens[1:])
+        node = {"tag": tag, "left": node, "right": right_node}
+    return node, tokens
+
+def test_parse_bool_expression(): 
+    pass
+
 def parse(tokens):
-    ast, tokens = parse_expression(tokens)
+    ast, tokens = parse_bool_expression(tokens)
     return ast
 
 def test_parse():
     print("testing parse")
-    tokens = tokenize("2+3*4-5")
-    ast, _ = parse_expression(tokens)
+    tokens = tokenize("2+3*4-5<6and7or8<9")
+    ast, _ = parse_bool_expression(tokens)
     assert parse(tokens) == ast
 
 if __name__ == "__main__":
     test_parse_simple_expression()
     test_parse_factor()
     test_parse_term()
+    test_parse_math_expression()
+    test_parse_comp_expression()
+    test_parse_bool_term()
+    test_parse_bool_expression()
     test_parse()
     print("done")
