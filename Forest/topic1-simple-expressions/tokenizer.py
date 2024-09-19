@@ -37,7 +37,7 @@ def tokenize(characters):
             match = pattern.match(characters, position)
             if match:
                 break
-        assert match
+        assert match, f"Did not find  match for {characters[position:]}"
         token = {
             "tag": tag,
             "value": match.group(0),
