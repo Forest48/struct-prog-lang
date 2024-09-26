@@ -97,7 +97,6 @@ def test_identifier_tokens():
         tokens = tokenize(s)
         assert tokens[0]["tag"] == "identifier"
         assert tokens[0]["value"] == s
-        # print([tokens])
     
 
 
