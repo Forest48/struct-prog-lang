@@ -15,7 +15,7 @@ Accept a string of tokens, return an AST expressed as stack of dictionaries
     print_statement = "print" "(" expression ")"
     assign_statement = expression
     statement = print_statement |
-                assignment_expression
+                assign_expression
 """
 
 from pprint import pprint
@@ -171,7 +171,7 @@ def test_parse_math_expression():
         "tag": "+",
     }
 
-def parse_comparison_expression(tokens):
+def parse_comp_expression(tokens):
     """
     comp_expression == math_expression [ "==" | "!=" | "<" | ">" | "<=" | ">="  arithmetic expression ]
     """
@@ -182,14 +182,14 @@ def parse_comparison_expression(tokens):
         node = {"tag": tag, "left": node, "right": right_node}
     return node, tokens
 
-def test_parse_comparison_expression():
+def test_parse_comp_expression():
     """
     comp_expression == math_expression [ "==" | "!=" | "<" | ">" | "<=" | ">="  arithmetic expression ]
     """
-    print("testing parse_comparison_expression")
+    print("testing parse_comp_expression")
     for op in ["<",">"]:
         tokens = tokenize(f"2{op}3")
-        ast, tokens = parse_comparison_expression(tokens)
+        ast, tokens = parse_comp_expression(tokens)
         assert ast == {
             "left": {"position": 0, "tag": "number", "value": 2},
             "right": {"position": 2, "tag": "number", "value": 3},
@@ -197,36 +197,36 @@ def test_parse_comparison_expression():
         }
     for op in ["==", ">=", "<=", "!="]:
         tokens = tokenize(f"2{op}3")
-        ast, tokens = parse_comparison_expression(tokens)
+        ast, tokens = parse_comp_expression(tokens)
         assert ast == {
             "left": {"position": 0, "tag": "number", "value": 2},
             "right": {"position": 3, "tag": "number", "value": 3},
             "tag": op,
         }
 
-def parse_boolean_term(tokens):
+def parse_bool_term(tokens):
     """
     bool_term == comp_expression { "and" comp_expression }
     """
-    node, tokens = parse_comparison_expression(tokens)
+    node, tokens = parse_comp_expression(tokens)
     while tokens[0]["tag"] in ["&&"]:
         tag = tokens[0]["tag"]
-        right_node, tokens = parse_comparison_expression(tokens[1:])
+        right_node, tokens = parse_comp_expression(tokens[1:])
         node = {"tag": tag, "left": node, "right": right_node}
     return node, tokens
 
-def test_parse_boolean_term():
-    print("testing parse_boolean_term")
+def test_parse_bool_term():
+    print("testing parse_bool_term")
     for op in ["<",">"]:
         tokens = tokenize(f"2{op}3")
-        ast, tokens = parse_boolean_term(tokens)
+        ast, tokens = parse_bool_term(tokens)
         assert ast == {
             "left": {"position": 0, "tag": "number", "value": 2},
             "right": {"position": 2, "tag": "number", "value": 3},
             "tag": op,
         }
     tokens = tokenize(f"2&&3")
-    ast, tokens = parse_boolean_term(tokens)
+    ast, tokens = parse_bool_term(tokens)
     assert ast == {
         "tag": "&&",
         "left": {"tag": "number", "value": 2, "position": 0},
@@ -237,10 +237,10 @@ def parse_bool_expression(tokens):
     """
     bool_expression == bool_term { "||" bool_term }
     """
-    node, tokens = parse_boolean_term(tokens)
+    node, tokens = parse_bool_term(tokens)
     while tokens[0]["tag"] in ["||"]:
         tag = tokens[0]["tag"]
-        right_node, tokens = parse_boolean_term(tokens[1:])
+        right_node, tokens = parse_bool_term(tokens[1:])
         node = {"tag": tag, "left": node, "right": right_node}
     return node, tokens
 
@@ -398,8 +398,8 @@ if __name__ == "__main__":
     test_parse_factor()
     test_parse_term()
     test_parse_math_expression()
-    test_parse_comparison_expression()
-    test_parse_boolean_term()
+    test_parse_comp_expression()
+    test_parse_bool_term()
     test_parse_bool_expression()
     test_parse_expression()
     test_parse_print_statement()

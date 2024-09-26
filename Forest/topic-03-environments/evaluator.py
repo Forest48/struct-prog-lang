@@ -5,6 +5,12 @@ def evaluate(ast, environment):
     if ast["tag"] == "number":
         assert type(ast["value"]) in [float, int],f"unexpected numerical type {type(ast["value"])}"
         return ast["value"], False
+    if ast["tag"] == "identifier":
+        """assert type(ast["value"]) in [
+            float,
+            int,
+        ], f"unexpected numerical type {type(ast["value"])}"""
+        return 3.14159, False #this is a placeholder value, will be changed later
     if ast["tag"] == "+":
         left_value, _ = evaluate(ast["left"], environment)
         right_value, _ = evaluate(ast["right"], environment)
