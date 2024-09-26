@@ -1,7 +1,3 @@
-# copied and edited by Forest on 9/23/34
-# originally coded by DeLozier
-# initially copied from DeLozier's post class commit on 9/23/24
-
 from tokenizer import tokenize
 from parser import parse
 
@@ -10,60 +6,60 @@ def evaluate(ast, environment):
         assert type(ast["value"]) in [float, int],f"unexpected numerical type {type(ast["value"])}"
         return ast["value"], False
     if ast["tag"] == "+":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs + rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value + right_value, False
     if ast["tag"] == "-":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs - rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value - right_value, False
     if ast["tag"] == "*":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs * rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value * right_value, False
     if ast["tag"] == "/":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        assert rhs != 0, "cannot divide by zero"
-        return (lhs / rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        assert right_value != 0, "Division by zero"
+        return left_value / right_value, False
     if ast["tag"] == "negate":
         value, _ = evaluate(ast["value"], environment)
-        return (value * -1), False
+        return -value, False
     if ast["tag"] == "&&":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs and rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value and right_value, False
     if ast["tag"] == "||":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs or rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value or right_value, False
     if ast["tag"] == "!":
         value, _ = evaluate(ast["value"], environment)
-        return (not value), False
+        return not value, False
     if ast["tag"] == "<":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs < rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value < right_value, False
     if ast["tag"] == ">":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs > rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value > right_value, False
     if ast["tag"] == "<=":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs <= rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value <= right_value, False
     if ast["tag"] == ">=":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs >= rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value >= right_value, False
     if ast["tag"] == "==":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs == rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value == right_value, False
     if ast["tag"] == "!=":
-        lhs, _ = evaluate(ast["left"], environment)
-        rhs, _ = evaluate(ast["right"], environment)
-        return (lhs != rhs), False
+        left_value, _ = evaluate(ast["left"], environment)
+        right_value, _ = evaluate(ast["right"], environment)
+        return left_value != right_value, False
     if ast["tag"] == "print":
         if ast["value"]:
             value, _ = evaluate(ast["value"], environment)
@@ -128,11 +124,10 @@ def test_evaluate_negation():
 
 def test_print_statement():
     print("test print statement")
-    equals("print(7-32)", {}, None, {})
+    equals("print(77)", {}, None, {})
     equals("print()", {}, None, {})
-    equals("print(57)", {}, None, {})
+    equals("print(50+7)", {}, None, {})
     equals("print(50+8)", {}, None, {})
-    
 
 
 if __name__ == "__main__":
