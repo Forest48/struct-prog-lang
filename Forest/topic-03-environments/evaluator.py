@@ -6,6 +6,11 @@ def evaluate(ast, environment):
         assert type(ast["value"]) in [float, int],f"unexpected numerical type {type(ast["value"])}"
         return ast["value"], False
     if ast["tag"] == "identifier":
+        identifier = ast["value"]
+        assert identifier in environment, f"Uknown identifier: '{identifier}'."
+        if identifier in environment:
+            return environment[identifier], False # gives the value of an already assigned vaiable
+        
         """assert type(ast["value"]) in [
             float,
             int,
@@ -73,6 +78,21 @@ def evaluate(ast, environment):
         else:
             print()
         return None, False
+    if ast["tag"] == "=":
+        assert 'target' in ast
+        target = ast["target"]
+        assert target['tag'] == 'identifier'
+        identifier = target['value']
+        value, _ = evaluate(ast["value"], environment)
+        environment[identifier] = value
+        return None, False
+    if ast["tag"] == "list":
+        while ast:
+            assert "statement" in ast
+            value, _ = evaluate(ast["value"], environment)
+            ast = ast["list"]
+        return None, False
+
     assert False, "Unknown operator in AST"
 
 def equals(code, environment, expected_result, expected_environment=None):
@@ -98,12 +118,15 @@ def test_evaluate_single_value():
     equals("4",{},4,{})
     equals("3",{},3,{})
     equals("4.2",{},4.2,{})
+    equals("x", {'x':1}, 1)
+    equals("y", {'x':1, 'y':2}, 2)
 
 def test_evaluate_addition():
     print("test evaluate addition")
     equals("1+1",{},2,{})
     equals("1+2+3",{},6,{})
     equals("1.2+2.3+3.4",{},6.9,{})
+    equals("x+y", {'x':1, 'y':2}, 3)
 
 def test_evaluate_subtraction():
     print("test evaluate subtraction")
@@ -127,13 +150,24 @@ def test_evaluate_negation():
     equals("-2",{},-2,{})
     equals("--3",{},3,{})
 
-
 def test_print_statement():
     print("test print statement")
     equals("print(77)", {}, None, {})
     equals("print()", {}, None, {})
     equals("print(50+7)", {}, None, {})
     equals("print(50+8)", {}, None, {})
+
+def test_assignment():
+    print("test assignment")
+    equals("X=1", {}, None, {"X":1})
+    equals("x=x+1", {"x":14}, None, {"x":15})
+
+def test_statement_list():
+    print("test statement list")
+    equals("1", {}, 1)
+    equals("1;2", {}, None)
+    equals("2;4;print(6);print(8)", {}, None)
+    
 
 
 if __name__ == "__main__":
@@ -143,5 +177,7 @@ if __name__ == "__main__":
     test_evaluate_multiplication()
     test_evaluate_division()
     test_evaluate_negation()
+    test_assignment()
+    test_statement_list()
     test_print_statement()
     print("done.")

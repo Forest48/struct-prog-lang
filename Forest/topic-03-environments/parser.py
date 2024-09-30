@@ -16,6 +16,8 @@ Accept a string of tokens, return an AST expressed as stack of dictionaries
     assign_statement = expression
     statement = print_statement |
                 assign_expression
+    statement_list = statement{ ";" statement} {";"}
+    program = statement_list
 """
 
 from pprint import pprint
@@ -355,8 +357,51 @@ def test_parse_statement():
     tokens = tokenize("2+3*4+5")
     assert parse_statement(tokens) == parse_expression(tokens)
 
-def parse(tokens):
+
+def parse_statement_list(tokens):
+    # statement_list = statement{ ";" statement} {";"}
     ast, tokens = parse_statement(tokens)
+    if tokens[0]["tag"] != ';':
+        return ast, tokens
+    ast = {
+        'tag':'list',
+        'statement':ast,
+        'next':None
+    }
+    top_ast = ast
+    while tokens[0]["tag"] == ';':
+        tokens = tokens[1:]
+        next_ast, tokens = parse_statement(tokens)
+        current_ast['list'] = {
+            'tag':'list',
+            'statement':ast,
+            'list':None
+        }
+        current_ast = current_ast['list']
+    return top_ast, tokens
+
+def test_parse_statement_list():
+    print("test parse satement list")
+    tokens = tokenize("4+5")
+    assert parse_statement_list(tokens) == parse_statement(tokens)
+    tokens = tokenize("4+5;3+4")
+    ast, tokens = parse_statement_list(tokens)
+
+
+def parse_program(tokens):
+    # program = statement_list
+    return parse_statement_list(tokens)
+
+
+def test_parse_program():
+    tokens = tokenize("2+3*4+5")
+    ast, _ = parse_statement(tokens)
+    assert parse_program(tokens) == parse_statement_list(tokens) == ast
+    
+
+
+def parse(tokens):
+    ast, tokens = parse_program(tokens)
     return ast 
 
 def test_parse():
@@ -405,5 +450,7 @@ if __name__ == "__main__":
     test_parse_print_statement()
     test_parse_assign_statement()
     test_parse_statement()
+    test_parse_statement_list()
+    test_parse_program()
     test_parse()
     print("done")
