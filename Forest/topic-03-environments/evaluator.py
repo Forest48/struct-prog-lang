@@ -89,10 +89,9 @@ def evaluate(ast, environment):
     if ast["tag"] == "list":
         while ast:
             assert "statement" in ast
-            value, _ = evaluate(ast["value"], environment)
+            value, return_chain = evaluate(ast["statement"], environment)
             ast = ast["list"]
-        return None, False
-
+        return value, return_chain
     assert False, "Unknown operator in AST"
 
 def equals(code, environment, expected_result, expected_environment=None):
@@ -165,7 +164,7 @@ def test_assignment():
 def test_statement_list():
     print("test statement list")
     equals("1", {}, 1)
-    equals("1;2", {}, None)
+    equals("1;2", {}, 2)
     equals("2;4;print(6);print(8)", {}, None)
     
 

@@ -359,19 +359,21 @@ def test_parse_statement():
 
 
 def parse_statement_list(tokens):
-    # statement_list = statement{ ";" statement} {";"}
+    """
+    statement_list = statement{ ";" statement} {";"}
+    """
     ast, tokens = parse_statement(tokens)
     if tokens[0]["tag"] != ';':
         return ast, tokens
-    ast = {
+    current_ast = {
         'tag':'list',
         'statement':ast,
         'next':None
     }
-    top_ast = ast
+    top_ast = current_ast
     while tokens[0]["tag"] == ';':
         tokens = tokens[1:]
-        next_ast, tokens = parse_statement(tokens)
+        ast, tokens = parse_statement(tokens)
         current_ast['list'] = {
             'tag':'list',
             'statement':ast,
@@ -384,8 +386,18 @@ def test_parse_statement_list():
     print("test parse satement list")
     tokens = tokenize("4+5")
     assert parse_statement_list(tokens) == parse_statement(tokens)
-    tokens = tokenize("4+5;3+4")
+    tokens = tokenize("print(4);print(5)")
     ast, tokens = parse_statement_list(tokens)
+    assert ast == {
+        'tag':'list', 'statement': 
+        {'tag': 'print', 'value': 
+         {'tag': 'number', 'value': 4, 'position': 6}}, 
+        'next': None, 'list': 
+        {'tag': 'list', 'statement': 
+         {'tag': 'print', 'value': 
+          {'tag': 'number', 'value': 5, 'position': 15}}, 
+          'list': None}
+    }
 
 
 def parse_program(tokens):
@@ -396,7 +408,7 @@ def parse_program(tokens):
 def test_parse_program():
     tokens = tokenize("2+3*4+5")
     ast, _ = parse_statement(tokens)
-    assert parse_program(tokens) == parse_statement_list(tokens) == ast
+    assert parse_program(tokens) == parse_statement_list(tokens)
     
 
 
