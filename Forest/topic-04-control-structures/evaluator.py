@@ -71,6 +71,15 @@ def evaluate(ast, environment):
         else:
             print()
         return None, False
+    if ast["tag"] == "if":
+        condition, _ = evaluate(ast["condition"], environment)
+        if condition:
+            value, _ = evaluate(ast["then"], environment)
+            return value, False
+        if "else" in ast:
+            value, _ = evaluate(ast["else"], environment)
+            return value, False
+        return False, False
     if ast["tag"] == "=":
         assert 'target' in ast
         target = ast['target']
@@ -142,7 +151,6 @@ def test_evaluate_negation():
     equals("-2",{},-2,{})
     equals("--3",{},3,{})
 
-
 def test_print_statement():
     print("test print statement")
     equals("print(77)", {}, None, {})
@@ -150,6 +158,12 @@ def test_print_statement():
     equals("print(50+7)", {}, None, {})
     equals("print(50+8)", {}, None, {})
 
+def test_evaluate_if_statement():
+    print("test evaluate_if_statement")
+#    equals("if(1) 3", {}, 3, {})
+ #   equals("if(0) 3", {}, False, {})
+  #  equals("if(0) 3 else 2", {}, 2, {})
+   # equals("if(0) {4;5;6} else {3;2;1}", {}, 1, {})
 
 def test_assignment_statement():
     print("test assignment_statement")
@@ -169,6 +183,7 @@ if __name__ == "__main__":
     test_evaluate_division()
     test_evaluate_negation()
     test_print_statement()
+    test_evaluate_if_statement()
     test_assignment_statement()
     test_statement_list()
     print("done.")
