@@ -113,12 +113,12 @@ def test_lower():
     assert lower([6, 8, 10], 2) == []
 
 
-def equal(t, n): # bugged, will not run rn
+def equal(t, n):
     if t == []:
         return []
     if first(t) == n:
-        return [first(t)] + lower(tail(t), n)
-    return lower(tail(t), n)    
+        return [first(t)] + equal(tail(t), n)
+    return equal(tail(t), n)    
 
 def test_equal():
     print("testing equal()")
@@ -132,7 +132,7 @@ def sort(t): # this is quicksort using functions we created outselves
     if t == []:
         return []
     n = first(t)
-    return lower(sort(tail(t), n)) + equal(tail(t), n) + upper(sort(tail(t), n))
+    return sort(lower(tail(t), n)) + equal(t, n) + sort(upper(tail(t), n))
 
 def test_sort():
     print("testing sort()")
@@ -142,6 +142,8 @@ def test_sort():
     assert sort([7]) == [7]
     assert sort([4, 8, 2, 10, 6, 0, 4]) == [0, 2, 4, 4, 6, 8, 10]
 
+# copy, mirror, and square_root functions go here
+# they don't seem to currently be in the github
 
 if __name__ == "__main__":
     test_count()
@@ -152,6 +154,6 @@ if __name__ == "__main__":
     test_sum()
     test_upper()
     test_lower()
-#    test_equal()
-#    test_sort()
+    test_equal()
+    test_sort()
     print("done")
