@@ -142,8 +142,70 @@ def test_sort():
     assert sort([7]) == [7]
     assert sort([4, 8, 2, 10, 6, 0, 4]) == [0, 2, 4, 4, 6, 8, 10]
 
-# copy, mirror, and square_root functions go here
-# they don't seem to currently be in the github
+
+def copy(t): 
+    if t == []:
+        return []
+    return [first(t)] + copy(tail(t)) 
+
+def test_copy():
+    print("testing copy()")
+    t = [6, 5, 9]
+    s = copy(t)
+    s[1] = 1
+    assert t == [6, 5, 9]
+    assert s == [6, 1, 9]
+    assert copy([]) == []
+
+
+def reverse(t):
+    if t == []:
+        return []
+    return reverse(tail(t)) + [first(t)]
+
+def test_reverse():
+    print("testing reverse()")
+    assert reverse([]) == []
+    assert reverse([4, 6, 9]) == [9, 6, 4]
+    assert reverse([0, 8, 9, 12]) == [12, 9, 8, 0]
+
+
+def mirror(t):
+    if t == []:
+        return []
+    if type(first(t)) is list:
+        return mirror(tail(t)) + [mirror(first(t))]
+    else:
+        return mirror(tail(t)) + [first(t)]
+
+def test_mirror():
+    print("testing mirror()")
+    assert mirror([]) == []
+    assert mirror([4, 1, 3]) == [3, 1, 4]
+    assert mirror([5, 6, [ 9, [6, 9], 8]]) == [[8, [9, 6], 9], 6, 5]
+    assert mirror([2, [], 9, 8, [6, 12, 2]]) == [[2, 12, 6], 8, 9, [], 2] 
+
+
+def square_root(n, min, max):
+    assert n > 1.0
+    #print(n, min, max)
+    if (min + max) / 2 in [min, max]:
+        return min
+    guess = (min + max) / 2
+    if guess * guess > n:
+        max = guess
+        return square_root(n, min, max)
+    else:
+        min = guess
+        return square_root(n, min, max)
+
+def test_square_root():
+    print("testing square_root()")
+    assert square_root(9.0, 3.0, 3.0) == 3.0
+    assert square_root(9.0, 3.0001, 3.0001) == 3.0001
+    assert 2.99 <= square_root(9, 0, 9) <= 3.01
+    assert square_root(9, 0, 9) == 3
+    assert 31 <= square_root(1000, 0, 500) <= 32
 
 if __name__ == "__main__":
     test_count()
@@ -156,4 +218,8 @@ if __name__ == "__main__":
     test_lower()
     test_equal()
     test_sort()
+    test_copy()
+    test_reverse()
+    test_mirror()
+    test_square_root()
     print("done")
