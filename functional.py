@@ -2,6 +2,8 @@
 # I (forest) copied it
 # the goal is to sort a list with minimal local variable, no global variables, and breaking the problem down
 
+# THIS IS TOPICS 6 AND 7
+
 # ( CAR '(1 2 3) ) --> 1      "first"
 # ( CDR '(1 2 3) ) --> '(2 3) "tail"
 
