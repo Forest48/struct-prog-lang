@@ -89,19 +89,19 @@ def test_parse_simple_expression():
 
     node, remaining_tokens = parse_simple_expression(tokenize("x"))
     assert node["tag"] == "identifier"
-    assert node["value"] == "x", f"Expected 'x', got {result}"
+    assert node["value"] == "x", f"Expected 'x', got {node["value"]}"
     assert remaining_tokens[0]["tag"] is None, "Expected end of tokens"
 
     for n in [1, 12, 1.3, 1.23]:
         node, remaining_tokens = parse_simple_expression(tokenize(str(n)))
         assert node["tag"] == "number"
-        assert node["value"] == n, f"Expected {n}, got {result}"
+        assert node["value"] == n, f"Expected {n}, got {node["value"]}"
         assert remaining_tokens[0]["tag"] is None, "Expected end of tokens"
 
     for s in ['""', '"hello"']:
         node, remaining_tokens = parse_simple_expression(tokenize(s))
         assert node["tag"] == "string"
-        assert node["value"] == s.replace('"', ""), f"Expected {s}, got {result}"
+        assert node["value"] == s.replace('"', ""), f"Expected {s}, got {node["value"]}"
         assert remaining_tokens[0]["tag"] is None, "Expected end of tokens"
 
     for s in ["[1,2,3]", "[]"]:
@@ -362,14 +362,14 @@ def parse_complex_expression(tokens):
                 tokens[0]["tag"] == "]"
             ), f"Expected ']' at position {tokens[0]['position']}"
             tokens = tokens[1:]
-            ast = {"tag": "indexed", "base": ast, "index": index_ast}
+            ast = {"tag": "complex", "base": ast, "index": index_ast}
         if tokens[0]["tag"] == ".":
             tokens = tokens[1:]
             assert (
                 tokens[0]["tag"] == "identifier"
             ), f"Expected identifier at position {tokens[0]['position']}"
             ast = {
-                "tag": "indexed",
+                "tag": "complex",
                 "base": ast,
                 "index": {"tag": "string", "value": tokens[0]["value"]},
             }
@@ -400,21 +400,21 @@ def test_parse_complex_expression():
         assert parse_complex_expression(t) == parse_simple_expression(t)
     ast, tokens = parse_complex_expression(tokenize("x[3]"))
     assert ast == {
-        "tag": "indexed",
+        "tag": "complex",
         "base": {"tag": "identifier", "value": "x"},
         "index": {"tag": "number", "value": 3},
     }
     ast, tokens = parse_complex_expression(tokenize('x["x"]'))
     assert ast == {
-        "tag": "indexed",
+        "tag": "complex",
         "base": {"tag": "identifier", "value": "x"},
         "index": {"tag": "string", "value": "x"},
     }
     ast, tokens = parse_complex_expression(tokenize('x["x"][3]'))
     assert ast == {
-        "tag": "indexed",
+        "tag": "complex",
         "base": {
-            "tag": "indexed",
+            "tag": "complex",
             "base": {"tag": "identifier", "value": "x"},
             "index": {"tag": "string", "value": "x"},
         },
@@ -422,7 +422,7 @@ def test_parse_complex_expression():
     }
     ast, tokens = parse_complex_expression(tokenize("x.abc"))
     assert ast == {
-        "tag": "indexed",
+        "tag": "complex",
         "base": {"tag": "identifier", "value": "x"},
         "index": {"tag": "string", "value": "abc"},
     }
