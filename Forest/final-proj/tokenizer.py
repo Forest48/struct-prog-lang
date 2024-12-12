@@ -1,4 +1,4 @@
-# copied from prof's repo 11/25/24
+# copied from the version in topic-08, then edited to include xor, nor, and nand
 
 import re
 
@@ -7,7 +7,7 @@ patterns = [
     [r"\s+", "whitespace"],  # Whitespace
     [r"\d*\.\d+|\d+\.\d*|\d+", "number"],  # numeric literals
     [r'"([^"]|"")*"', "string"],  # string literals
-    [r"true|false", "boolean"],  # boolean literals
+    [r"true|false", "bool"],  # bool literals
     [r"null", "null"],  # the null literal
     [r"function", "function"],  # function keyword
     [r"return", "return"],  # return keyword
@@ -45,8 +45,8 @@ patterns = [
     [r"<", "<"],
     [r">", ">"],
     [r"\&\&", "&&"],
-    [r"\!\&", "!&"],   # nand
     [r"\|\|", "||"],
+    [r"\!\&", "!&"],   # nand
     [r"\!\|", "!|"],   # nor
     [r"\|X\|", "|X|"], # xor
     [r"\!", "!"],
@@ -96,7 +96,7 @@ def tokenize(characters, generated_tags=test_generated_tags):
                 token["value"] = float(token["value"])
             else:
                 token["value"] = int(token["value"])
-        if token["tag"] == "boolean":
+        if token["tag"] == "bool":
             token["value"] = 1 if token["value"] == "true" else 0
 
         # append token to stream, skipping whitespace and comments
@@ -112,7 +112,7 @@ def tokenize(characters, generated_tags=test_generated_tags):
 
 def test_simple_tokens():
     print("testing simple tokens...")
-    examples = ".,[,],+,-,*,/,(,),{,},;,:,!,&&,||,<,>,<=,>=,==,!=,=".split(",")
+    examples = ".,[,],+,-,*,/,(,),{,},;,:,!,&&,||,<,>,<=,>=,==,!=,=,!&,!|,|X|".split(",")
     examples.append(",")
     for example in examples:
         t = tokenize(example)[0]
@@ -153,12 +153,12 @@ def test_string_tokens():
         assert t[0]["value"] == s[1:-1].replace('""', '"')
 
 
-def test_boolean_tokens():
-    print("testing boolean tokens...")
+def test_bool_tokens():
+    print("testing bool tokens...")
     for s in ["true", "false"]:
         t = tokenize(s)
         assert len(t) == 2
-        assert t[0]["tag"] == "boolean"
+        assert t[0]["tag"] == "bool"
         assert t[0]["value"] == (
             s == "true"
         ), f"got {[t[0]['value']]} expected {[(s == 'true')]}"
@@ -277,12 +277,25 @@ def test_tag_coverage():
         assert tag in test_generated_tags, f"Tag [ {tag} ] was not tested."
 
 
+def test_added_keywords():
+    print("testing additional keywords")
+    newTokens = ["!&", "!|", "|X|"]
+    for n in newTokens:
+        t = tokenize(n)[0]
+        assert t["tag"] == n
+        assert t["position"] == 0
+        assert t["value"] == n
+    t1 = tokenize("nand nor xor")
+    t2 = tokenize("!& !| |X|")
+    assert [t["tag"] for t in t1] == [t["tag"] for t in t2]
+
+
 if __name__ == "__main__":
     print("testing tokenizer.")
     test_simple_tokens()
     test_number_tokens()
     test_string_tokens()
-    test_boolean_tokens()
+    test_bool_tokens()
     test_identifier_tokens()
     test_whitespace()
     test_multiple_tokens()
@@ -290,4 +303,5 @@ if __name__ == "__main__":
     test_comments()
     test_error()
     test_tag_coverage()
+    test_added_keywords()
     print("done.")
